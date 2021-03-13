@@ -1,4 +1,7 @@
 <template>
+    <div>
+        <lightning-input type="search" placeholder="Search" onchange={updateSearch}></lightning-input>
+    </div>
     <div style="height: 300px;">
         <lightning-datatable key-field="id" data={data} columns={columns} sorted-by={sortBy}
             sorted-direction={sortDirection} onsort={handleSortdata}>

@@ -11,23 +11,33 @@ const columns = [
 
 export default class LSSalesPanel extends LightningElement {
     @track inputData;
+    @track originalData = [];
     @track data = [];
     @track error;
     @track columns = columns;
     @track sortBy;
     @track sortDirection;
+    @track searchKey = '';
 
     @wire(getSalesInfo)
     wiredResponse(result) {
         this.inputData = result;
         const { data, error } = result;
         if (data) {
-            this.data = data;
+            this.originalData = data;
+            this.data = JSON.parse(JSON.stringify(this.originalData));
             this.error = undefined;
         } else if (error) {
             this.error = error;
+            this.originalData = undefined;
             this.data = undefined;
+            const newError = new ShowToastEvent({
+                "title": "Error",
+                "message": error.body.message,
+                "variant": "error",
+            });
         }
+        console.log('originalData', this.originalData);
         console.log('data', this.data);
         console.log('error', this.error);
     }
@@ -59,5 +69,31 @@ export default class LSSalesPanel extends LightningElement {
         });
         // set the sorted data to data table data
         this.data = parseData;
+    }
+
+    updateSearch(event) {
+        this.searchKey = event.target.value;
+        console.log('searchKey', this.searchKey);
+        var searchData = [];
+        if (this.searchKey === '') {
+            this.data = JSON.parse(JSON.stringify(this.originalData));
+            searchData = [];
+        } else {
+            this.data = JSON.parse(JSON.stringify(this.originalData));
+            searchData = [];
+            try {
+                for (let value in this.data) {
+                    let businessName = this.data[value].businessName.toLowerCase();
+                    let searchValue = this.searchKey.toLowerCase();
+                    if (businessName.includes(searchValue)) {
+                        searchData.push(this.data[value]);
+                    }
+                }
+                console.log('searchData',searchData);
+                this.data = searchData;
+            } catch (err) {
+                console.log('err', err);
+            }
+        }
     }
 }
