@@ -1,9 +1,7 @@
 <template>
     <div style="height: 300px;">
-        <lightning-datatable
-                key-field="id"
-                data={data}
-                columns={columns}>
+        <lightning-datatable key-field="id" data={data} columns={columns} sorted-by={sortBy}
+            sorted-direction={sortDirection} onsort={handleSortdata}>
         </lightning-datatable>
-    </div>    
+    </div>
 </template>
