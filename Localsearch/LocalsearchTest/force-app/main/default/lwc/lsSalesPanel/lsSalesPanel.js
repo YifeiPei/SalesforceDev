@@ -4,6 +4,7 @@ import { NavigationMixin } from 'lightning/navigation';
 import { refreshApex } from '@salesforce/apex';
 import getSalesInfo from '@salesforce/apex/LSSalesPanelCtrl.getData';
 import convertLeadRequest from '@salesforce/apex/LSSalesPanelCtrl.convertLeads';
+import cloneRecordsRequest from '@salesforce/apex/LSSalesPanelCtrl.cloneRecords';
 
 const columns = [
     { label: 'Business Name', fieldName: 'businessName', sortable: "true" },
@@ -161,7 +162,7 @@ export default class LSSalesPanel extends NavigationMixin(LightningElement) {
 
     convertRecord(event) {
         var leadIds = new Set();
-        var oppIds = new Set ();
+        var oppIds = new Set();
         var selectedRecords = this.template.querySelector("lightning-datatable").getSelectedRows();
         for (let value in selectedRecords) {
             if (selectedRecords[value].type === leadType) {
@@ -193,7 +194,7 @@ export default class LSSalesPanel extends NavigationMixin(LightningElement) {
                     });
                     this.dispatchEvent(newError);
                 });
-        } 
+        }
         if (oppIds.size > 0) {
             const newInfo = new ShowToastEvent({
                 "title": "Info",
@@ -211,6 +212,35 @@ export default class LSSalesPanel extends NavigationMixin(LightningElement) {
     }
 
     cloneRecord(event) {
+        var recordIds = new Set();
+        var selectedRecords = this.template.querySelector("lightning-datatable").getSelectedRows();
+        for (let value in selectedRecords) {
+            recordIds.add(selectedRecords[value].id);
+        }
+        if (recordIds.size > 0) {
+            cloneRecordsRequest({ RecordIds: JSON.stringify([...recordIds]) })
+                .then(result => {
+                    var requestResponse = JSON.parse(result);
+                    console.log('cloneButton: requestResponse', requestResponse);
+                    const success = new ShowToastEvent({
+                        "title": "Success!",
+                        "message": "Records cloned successfully",
+                        "variant": "success",
+                    });
+                    this.dispatchEvent(success);
+                    refreshApex(this.inputData);
+                })
+                .catch(error => {
+                    console.log('error', error);
+                    const newError = new ShowToastEvent({
+                        "title": "Error",
+                        "message": error.body.message,
+                        "variant": "error",
+                    });
+                    this.dispatchEvent(newError);
+                });
+        }
+
         console.log('clone clicked');
     }
 
@@ -219,7 +249,7 @@ export default class LSSalesPanel extends NavigationMixin(LightningElement) {
     }
 
     closeNewRecord() {
-        this.openNew = false
+        this.openNew = false;
     }
 
     chooseType(event) {

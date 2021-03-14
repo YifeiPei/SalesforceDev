@@ -68,6 +68,73 @@ public with sharing class LSSalesPanelHelper {
         return response;
     }
 
+    public static String recordsClone (List<Id> RecordIds) {
+        String response = '';
+        Set<Id> leadIds = new Set<Id> ();
+        Set<Id> oppIds = new Set<Id> ();
+
+        for(Id recordId: RecordIds) {
+            if (recordId.getSObjectType().getDescribe().getName() == 'Lead') 
+                leadIds.add(recordId);
+            if (recordId.getSObjectType().getDescribe().getName() == 'Opportunity') 
+                oppIds.add(recordId);
+        }
+
+        if (leadIds.size() > 0) {
+            String leadQuery = getCreatableFieldsSOQL('Lead') + 'leadIds';
+            List<Lead> leadsToInsert = new List<Lead> ();
+            List<Lead> leadCloneList = (List<Lead>)Database.query(leadQuery);
+            for (Lead newLead : leadCloneList) {
+                Lead clonedLead = newLead.clone(false, false, false, false);
+                if (clonedLead.Due_Date__c == null) {
+                    clonedLead.Due_Date__c = date.today().addYears(1);
+                } else {
+                    clonedLead.Due_Date__c = clonedLead.Due_Date__c.addYears(1);
+                }
+                leadsToInsert.add(clonedLead);
+            }
+            insert leadsToInsert;
+        }
+        if (oppIds.size() > 0) {
+            String oppQuery = getCreatableFieldsSOQL('Opportunity') + 'oppIds';
+            List<Opportunity> oppsToInsert = new List<Opportunity> ();
+            List<Opportunity> oppCloneList = (List<Opportunity>)Database.query(oppQuery);
+            for (Opportunity newOpp : oppCloneList) {
+                Opportunity clonedOpp = newOpp.clone(false, false, false, false);
+                clonedOpp.CloseDate = clonedOpp.CloseDate.addYears(1);
+                oppsToInsert.add(clonedOpp);
+            }
+            insert oppsToInsert;
+        }
+
+        response = 'success';
+        return response;
+    }
+
+    // Returns a dynamic SOQL statement for the whole object, includes only creatable fields since we will be inserting a cloned result of this query
+    public static string getCreatableFieldsSOQL(String objectName){
+        String selects = '';
+        
+        // Get a map of field name and field token
+        Map<String, Schema.SObjectField> fMap = Schema.getGlobalDescribe().get(objectName.toLowerCase()).getDescribe().Fields.getMap();
+        list<string> selectFields = new list<string>();
+        if (fMap != null){
+            for (Schema.SObjectField ft : fMap.values()){ // loop through all field tokens (ft)
+                Schema.DescribeFieldResult fd = ft.getDescribe(); // describe each field (fd)
+                if (fd.isCreateable()){ // field is creatable
+                    selectFields.add(fd.getName());
+                }
+            }
+        }
+        if (!selectFields.isEmpty()){
+            for (string s:selectFields){
+                selects += s + ',';
+            }
+            if (selects.endsWith(',')){selects = selects.substring(0,selects.lastIndexOf(','));}    
+        }
+        return 'SELECT ' + selects + ' FROM ' + objectName + ' WHERE id IN :';
+    }
+
     public Class salesInfo {
         @AuraEnabled
         public String id;
