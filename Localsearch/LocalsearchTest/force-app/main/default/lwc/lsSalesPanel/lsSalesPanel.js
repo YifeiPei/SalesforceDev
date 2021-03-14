@@ -1,5 +1,6 @@
 import { LightningElement, wire, track } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { NavigationMixin } from 'lightning/navigation';
 import { refreshApex } from '@salesforce/apex';
 import getSalesInfo from '@salesforce/apex/LSSalesPanelCtrl.getData';
 
@@ -16,7 +17,7 @@ const oppConvert = 'Convert to Sale';
 const leadType = 'Lead';
 const oppType = 'Opportunity';
 
-export default class LSSalesPanel extends LightningElement {
+export default class LSSalesPanel extends NavigationMixin(LightningElement) {
     @track inputData;
     @track originalData = [];
     @track data = [];
@@ -53,6 +54,7 @@ export default class LSSalesPanel extends LightningElement {
                 "message": error.body.message,
                 "variant": "error",
             });
+            this.dispatchEvent(newError);
         }
         console.log('originalData', this.originalData);
         console.log('data', this.data);
@@ -115,7 +117,7 @@ export default class LSSalesPanel extends LightningElement {
     }
 
     rowSelect(event) {
-        var leadOppSet = new Set ();
+        var leadOppSet = new Set();
         var selectedRecords = this.template.querySelector("lightning-datatable").getSelectedRows();
         var convertButton = this.template.querySelector('[data-my-id="convertButton"]');
         convertButton.textContent = neutralConvert;
@@ -152,10 +154,33 @@ export default class LSSalesPanel extends LightningElement {
 
     closeNewRecord() {
         this.openNew = false
-    } 
+    }
 
-    continueNewRecord() {
-        alert('save method invoked');
-        this.closeNewRecord();
+    chooseType(event) {
+        this.newRecordType = event.target.value;
+    }
+
+    continueNewRecord(event) {
+        if (this.newRecordType !== '') {
+            event.preventDefault();
+            event.stopPropagation();
+            this[NavigationMixin.Navigate]({
+                type: 'standard__objectPage',
+                attributes: {
+                    objectApiName: this.newRecordType,
+                    actionName: 'new'
+                }
+            });
+            this.newRecordType = '';
+            this.closeNewRecord();
+        } else {
+            const newError = new ShowToastEvent({
+                "title": "Error",
+                "message": "Please choose one of the object type.",
+                "variant": "error",
+            });
+            this.dispatchEvent(newError);
+        }
+
     }
 }
