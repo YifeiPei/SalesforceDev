@@ -1,13 +1,56 @@
 <template>
-    <div>
-        <lightning-input type="search" placeholder="Search" onchange={updateSearch}></lightning-input>
+    <div class="slds-grid slds-wrap">
+        <div class="slds-col slds-size_9-of-12">
+            <lightning-input type="search" placeholder="Search" onchange={updateSearch}></lightning-input>
+        </div>
+        <div class="slds-col slds-size_3-of-12">
+            <button class="slds-button slds-button_neutral slds-button_stretch" data-my-id="newButton" onclick={newRecord}>New</button>
+            <!-- <lightning-button data-my-id="newButton" name="new" label="New" onclick={newRecord} ></lightning-button> -->
+        </div>
+        <div class="slds-col slds-size_12-of-12 slds-scrollable" style="height: 300px;">
+            <lightning-datatable key-field="id" data={data} columns={columns} sorted-by={sortBy}
+                sorted-direction={sortDirection} onsort={handleSortdata} onrowselection={rowSelect}>
+            </lightning-datatable>
+        </div>
+        <div class="slds-col slds-size_8-of-12">
+            <button class="slds-button slds-button_neutral slds-button_stretch" data-my-id="convertButton" onclick={convertRecord}>{convertTo}</button>
+            <!-- <lightning-button data-my-id="convertButton" name="convert" label={convertTo} onclick={convertRecord}></lightning-button> -->
+        </div>
+        <div class="slds-col slds-size_2-of-12">
+            <button class="slds-button slds-button_neutral slds-button_stretch" onclick={cloneRecord}>Clone</button>
+            <!-- <lightning-button name="clone" label="Clone" onclick={cloneRecord} ></lightning-button> -->
+        </div>
+        <div class="slds-col slds-size_2-of-12">
+            <button class="slds-button slds-button_neutral slds-button_stretch" onclick={deleteRecord}>Delete</button>
+            <!-- <lightning-button name="delete" label="Delete" onclick={deleteRecord} ></lightning-button> -->
+        </div>
     </div>
-    <div style="height: 300px;">
-        <lightning-datatable key-field="id" data={data} columns={columns} sorted-by={sortBy}
-            sorted-direction={sortDirection} onsort={handleSortdata} onrowselection={rowSelect}>
-        </lightning-datatable>
-    </div>
-    <div>
-        <lightning-button data-my-id="convertButton" name="convert" label={convertTo} onclick={convertRecord}></lightning-button>
-    </div>
+    <template if:true={openNew}>
+        <div style="height: 640px;">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeNewRecord}>
+                            <lightning-icon icon-name="utility:close" size="medium">
+                            </lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">New Record</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <lightning-radio-group name="new-record-type"
+                          label="Create a new"
+                          options={newRecordTypes}
+                          value={value}
+                          type="radio"></lightning-radio-group>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="Cancel" variant="neutral" onclick={closeNewRecord}></lightning-button>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <lightning-button label="Continue" variant="brand" onclick={continueNewRecord}></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+        </template>
 </template>

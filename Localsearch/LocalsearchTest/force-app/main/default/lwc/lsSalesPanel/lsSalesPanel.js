@@ -26,6 +26,15 @@ export default class LSSalesPanel extends LightningElement {
     @track sortDirection;
     @track searchKey = '';
     @track convertTo = neutralConvert;
+    @track openNew = false;
+    @track newRecordType = '';
+
+    get newRecordTypes() {
+        return [
+            { label: leadType, value: leadType },
+            { label: oppType, value: oppType },
+        ];
+    }
 
     @wire(getSalesInfo)
     wiredResponse(result) {
@@ -109,22 +118,44 @@ export default class LSSalesPanel extends LightningElement {
         var leadOppSet = new Set ();
         var selectedRecords = this.template.querySelector("lightning-datatable").getSelectedRows();
         var convertButton = this.template.querySelector('[data-my-id="convertButton"]');
-        convertButton.label = neutralConvert;
+        convertButton.textContent = neutralConvert;
         for (let value in selectedRecords) {
             leadOppSet.add(selectedRecords[value].type);
         }
         if (leadOppSet.size > 1) {
-            convertButton.label = neutralConvert;
+            convertButton.textContent = neutralConvert;
         } else {
             if (leadOppSet.has(leadType)) {
-                convertButton.label = leadConvert;
+                convertButton.textContent = leadConvert;
             } else if (leadOppSet.has(oppType)) {
-                convertButton.label = oppConvert;
+                convertButton.textContent = oppConvert;
             }
         }
     }
 
     convertRecord(event) {
         console.log('convert clicked');
+    }
+
+    newRecord(event) {
+        console.log('new clicked');
+        this.openNew = true;
+    }
+
+    cloneRecord(event) {
+        console.log('clone clicked');
+    }
+
+    deleteRecord(event) {
+        console.log('delete clicked');
+    }
+
+    closeNewRecord() {
+        this.openNew = false
+    } 
+
+    continueNewRecord() {
+        alert('save method invoked');
+        this.closeNewRecord();
     }
 }
