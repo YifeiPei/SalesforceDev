@@ -113,12 +113,17 @@ export default class LSSalesPanel extends NavigationMixin(LightningElement) {
                         searchData.push(this.data[value]);
                     }
                 }
-                console.log('searchData', searchData);
+                //console.log('searchData', searchData);
                 this.data = searchData;
             } catch (err) {
                 console.log('err', err);
             }
         }
+    }
+
+    clearSearch(event) {
+        this.template.querySelector('[data-my-id="searchBox"]').value = null;
+        this.data = JSON.parse(JSON.stringify(this.originalData));
     }
 
     rowSelect(event) {

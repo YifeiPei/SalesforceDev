@@ -1,7 +1,20 @@
 <template>
     <div class="slds-grid slds-wrap">
-        <div class="slds-col slds-size_9-of-12">
-            <lightning-input type="search" placeholder="Search" onchange={updateSearch}></lightning-input>
+        <div class="slds-col slds-size_9-of-12 slds-form-element">
+            <!-- <lightning-input type="search" placeholder="Search" onchange={updateSearch}></lightning-input> -->
+            <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left-right">
+                <svg class="slds-icon slds-input__icon slds-input__icon_left slds-icon-text-default" aria-hidden="true">
+                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#search"></use>
+                </svg>
+                <input type="text" data-my-id="searchBox" id="text-input-id-1" placeholder="Search" class="slds-input"
+                    oninput={updateSearch} />
+                <button class="slds-button slds-button_icon slds-input__icon slds-input__icon_right" title="Clear" onclick={clearSearch}>
+                    <svg class="slds-button__icon slds-icon-text-light" aria-hidden="true">
+                        <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#clear"></use>
+                    </svg>
+                    <span class="slds-assistive-text">Clear</span>
+                </button>
+            </div>
         </div>
         <div class="slds-col slds-size_3-of-12">
             <button class="slds-button slds-button_neutral slds-button_stretch" data-my-id="newButton"
@@ -19,11 +32,13 @@
             <!-- <lightning-button data-my-id="convertButton" name="convert" label={convertTo} onclick={convertRecord}></lightning-button> -->
         </div>
         <div class="slds-col slds-size_2-of-12">
-            <button class="slds-button slds-button_neutral slds-button_stretch" onclick={cloneRecord} disabled={buttonDisable}>Clone</button>
+            <button class="slds-button slds-button_neutral slds-button_stretch" onclick={cloneRecord}
+                disabled={buttonDisable}>Clone</button>
             <!-- <lightning-button name="clone" label="Clone" onclick={cloneRecord} ></lightning-button> -->
         </div>
         <div class="slds-col slds-size_2-of-12">
-            <button class="slds-button slds-button_neutral slds-button_stretch" onclick={deleteRecord} disabled={buttonDisable}>Delete</button>
+            <button class="slds-button slds-button_neutral slds-button_stretch" onclick={deleteRecord}
+                disabled={buttonDisable}>Delete</button>
             <!-- <lightning-button name="delete" label="Delete" onclick={deleteRecord} ></lightning-button> -->
         </div>
     </div>
