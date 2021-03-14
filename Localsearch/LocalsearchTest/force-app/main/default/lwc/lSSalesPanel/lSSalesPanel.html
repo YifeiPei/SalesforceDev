@@ -4,7 +4,10 @@
     </div>
     <div style="height: 300px;">
         <lightning-datatable key-field="id" data={data} columns={columns} sorted-by={sortBy}
-            sorted-direction={sortDirection} onsort={handleSortdata}>
+            sorted-direction={sortDirection} onsort={handleSortdata} onrowselection={rowSelect}>
         </lightning-datatable>
+    </div>
+    <div>
+        <lightning-button name="convert" label={convertTo} onclick={convertRecord}></lightning-button>
     </div>
 </template>

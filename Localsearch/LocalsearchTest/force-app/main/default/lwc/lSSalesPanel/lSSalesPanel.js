@@ -1,5 +1,6 @@
 import { LightningElement, wire, track } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { refreshApex } from '@salesforce/apex';
 import getSalesInfo from '@salesforce/apex/LSSalesPanelCtrl.getData';
 
 const columns = [
@@ -8,6 +9,10 @@ const columns = [
     { label: 'Status', fieldName: 'status', sortable: "true" },
     { label: 'Due Date', fieldName: 'dueDate', type: 'date', sortable: "true" },
 ];
+
+const neutralConvert = 'Convert to (Opportunity|Sale)';
+const leadConvert = 'Convert to Opportunity';
+const oppConvert = 'Convert to Sale';
 
 export default class LSSalesPanel extends LightningElement {
     @track inputData;
@@ -18,6 +23,7 @@ export default class LSSalesPanel extends LightningElement {
     @track sortBy;
     @track sortDirection;
     @track searchKey = '';
+    @track convertTo = neutralConvert;
 
     @wire(getSalesInfo)
     wiredResponse(result) {
@@ -89,11 +95,20 @@ export default class LSSalesPanel extends LightningElement {
                         searchData.push(this.data[value]);
                     }
                 }
-                console.log('searchData',searchData);
+                console.log('searchData', searchData);
                 this.data = searchData;
             } catch (err) {
                 console.log('err', err);
             }
         }
+    }
+
+    rowSelect(event) {
+        var selectedRecords = this.template.querySelector("lightning-datatable").getSelectedRows();
+        console.log('selectedRecords', selectedRecords[0].type);
+    }
+
+    convertRecord(event) {
+        console.log('convert clicked');
     }
 }

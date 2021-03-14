@@ -20,6 +20,7 @@ public with sharing class LSSalesPanelHelper {
             for (Lead leadRecord : leadRecords) {
                 salesInfo newRecord = new salesInfo ();
                 Id leadId = leadRecord.Id;
+                newRecord.id = leadRecord.Id;
                 newRecord.businessName = leadRecord.Company;
                 newRecord.type = leadId.getSObjectType().getDescribe().getName();
                 newRecord.status = leadRecord.Status;
@@ -32,6 +33,7 @@ public with sharing class LSSalesPanelHelper {
             for (Opportunity opportunityRecord : opportunityRecords) {
                 salesInfo newRecord = new salesInfo ();
                 Id opportunityId = opportunityRecord.Id;
+                newRecord.id = opportunityRecord.Id;
                 newRecord.businessName = opportunityRecord.Account.Name;
                 newRecord.type = opportunityId.getSObjectType().getDescribe().getName();
                 newRecord.status = opportunityRecord.StageName;
@@ -44,6 +46,9 @@ public with sharing class LSSalesPanelHelper {
     }
 
     public Class salesInfo {
+        @AuraEnabled
+        public String id;
+
         @AuraEnabled
         public String businessName;
 
