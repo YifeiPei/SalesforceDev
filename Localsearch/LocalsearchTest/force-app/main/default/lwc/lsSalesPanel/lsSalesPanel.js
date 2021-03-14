@@ -5,6 +5,7 @@ import { refreshApex } from '@salesforce/apex';
 import getSalesInfo from '@salesforce/apex/LSSalesPanelCtrl.getData';
 import convertLeadRequest from '@salesforce/apex/LSSalesPanelCtrl.convertLeads';
 import cloneRecordsRequest from '@salesforce/apex/LSSalesPanelCtrl.cloneRecords';
+import deleteRecordsRequest from '@salesforce/apex/LSSalesPanelCtrl.deleteRecords';
 
 const columns = [
     { label: 'Business Name', fieldName: 'businessName', sortable: "true" },
@@ -240,11 +241,38 @@ export default class LSSalesPanel extends NavigationMixin(LightningElement) {
                     this.dispatchEvent(newError);
                 });
         }
-
         console.log('clone clicked');
     }
 
     deleteRecord(event) {
+        var recordIds = new Set();
+        var selectedRecords = this.template.querySelector("lightning-datatable").getSelectedRows();
+        for (let value in selectedRecords) {
+            recordIds.add(selectedRecords[value].id);
+        }
+        if (recordIds.size > 0) {
+            deleteRecordsRequest({ RecordIds: JSON.stringify([...recordIds]) })
+                .then(result => {
+                    var requestResponse = JSON.parse(result);
+                    console.log('deleteButton: requestResponse', requestResponse);
+                    const success = new ShowToastEvent({
+                        "title": "Success!",
+                        "message": "Records deleted successfully",
+                        "variant": "success",
+                    });
+                    this.dispatchEvent(success);
+                    refreshApex(this.inputData);
+                })
+                .catch(error => {
+                    console.log('error', error);
+                    const newError = new ShowToastEvent({
+                        "title": "Error",
+                        "message": error.body.message,
+                        "variant": "error",
+                    });
+                    this.dispatchEvent(newError);
+                });
+        }
         console.log('delete clicked');
     }
 
@@ -277,6 +305,5 @@ export default class LSSalesPanel extends NavigationMixin(LightningElement) {
             });
             this.dispatchEvent(newError);
         }
-
     }
 }

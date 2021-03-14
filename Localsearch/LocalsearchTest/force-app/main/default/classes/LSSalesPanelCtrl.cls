@@ -44,4 +44,19 @@ public with sharing class LSSalesPanelCtrl {
         }
         return JSON.serialize(response);
     }
+
+    @AuraEnabled
+    public static string deleteRecords(String RecordIds){
+        System.debug('Parameter RecordIds: ' + RecordIds);
+        List<Id> newReadIds = (List<Id>)JSON.deserialize(RecordIds,List<Id>.class);
+        System.debug('newReadIds: ' + newReadIds);
+        String response = '';
+        try {
+            response = LSSalesPanelHelper.recordsDeletion(newReadIds);
+        } catch (Exception e) {
+            System.debug('Exception: ' + e.getMessage() + ' ' + e.getLineNumber());
+            throw new AuraHandledException(e.getMessage());
+        }
+        return JSON.serialize(response);
+    }
 }

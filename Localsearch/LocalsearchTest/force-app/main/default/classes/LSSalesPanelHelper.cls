@@ -135,6 +135,31 @@ public with sharing class LSSalesPanelHelper {
         return 'SELECT ' + selects + ' FROM ' + objectName + ' WHERE id IN :';
     }
 
+    public static String recordsDeletion (List<Id> RecordIds) {
+        String response = '';
+        Set<Id> leadIds = new Set<Id> ();
+        Set<Id> oppIds = new Set<Id> ();
+
+        for(Id recordId: RecordIds) {
+            if (recordId.getSObjectType().getDescribe().getName() == 'Lead') 
+                leadIds.add(recordId);
+            if (recordId.getSObjectType().getDescribe().getName() == 'Opportunity') 
+                oppIds.add(recordId);
+        }
+
+        if (leadIds.size() > 0) {
+            List<Lead> leadsToDelete = [Select Id From Lead Where Id IN :leadIds];
+            delete leadsToDelete;
+        }
+        if (oppIds.size() > 0) {
+            List<Opportunity> oppsToDelete = [Select Id From Opportunity Where Id IN :oppIds];
+            delete oppsToDelete;
+        }
+
+        response = 'success';
+        return response;
+    }
+
     public Class salesInfo {
         @AuraEnabled
         public String id;
