@@ -13,6 +13,8 @@ const columns = [
 const neutralConvert = 'Convert to (Opportunity|Sale)';
 const leadConvert = 'Convert to Opportunity';
 const oppConvert = 'Convert to Sale';
+const leadType = 'Lead';
+const oppType = 'Opportunity';
 
 export default class LSSalesPanel extends LightningElement {
     @track inputData;
@@ -104,8 +106,22 @@ export default class LSSalesPanel extends LightningElement {
     }
 
     rowSelect(event) {
+        var leadOppSet = new Set ();
         var selectedRecords = this.template.querySelector("lightning-datatable").getSelectedRows();
-        console.log('selectedRecords', selectedRecords[0].type);
+        var convertButton = this.template.querySelector('[data-my-id="convertButton"]');
+        convertButton.label = neutralConvert;
+        for (let value in selectedRecords) {
+            leadOppSet.add(selectedRecords[value].type);
+        }
+        if (leadOppSet.size > 1) {
+            convertButton.label = neutralConvert;
+        } else {
+            if (leadOppSet.has(leadType)) {
+                convertButton.label = leadConvert;
+            } else if (leadOppSet.has(oppType)) {
+                convertButton.label = oppConvert;
+            }
+        }
     }
 
     convertRecord(event) {
