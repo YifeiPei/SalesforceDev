@@ -15,15 +15,15 @@
         </div>
         <div class="slds-col slds-size_8-of-12">
             <button class="slds-button slds-button_neutral slds-button_stretch" data-my-id="convertButton"
-                onclick={convertRecord}>{convertTo}</button>
+                onclick={convertRecord} disabled={convertDisable}>{convertTo}</button>
             <!-- <lightning-button data-my-id="convertButton" name="convert" label={convertTo} onclick={convertRecord}></lightning-button> -->
         </div>
         <div class="slds-col slds-size_2-of-12">
-            <button class="slds-button slds-button_neutral slds-button_stretch" onclick={cloneRecord}>Clone</button>
+            <button class="slds-button slds-button_neutral slds-button_stretch" onclick={cloneRecord} disabled={buttonDisable}>Clone</button>
             <!-- <lightning-button name="clone" label="Clone" onclick={cloneRecord} ></lightning-button> -->
         </div>
         <div class="slds-col slds-size_2-of-12">
-            <button class="slds-button slds-button_neutral slds-button_stretch" onclick={deleteRecord}>Delete</button>
+            <button class="slds-button slds-button_neutral slds-button_stretch" onclick={deleteRecord} disabled={buttonDisable}>Delete</button>
             <!-- <lightning-button name="delete" label="Delete" onclick={deleteRecord} ></lightning-button> -->
         </div>
     </div>

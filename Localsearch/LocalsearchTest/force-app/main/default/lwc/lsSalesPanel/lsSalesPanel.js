@@ -30,6 +30,8 @@ export default class LSSalesPanel extends NavigationMixin(LightningElement) {
     @track convertTo = neutralConvert;
     @track openNew = false;
     @track newRecordType = '';
+    @track convertDisable = true;
+    @track buttonDisable = true;
 
     get newRecordTypes() {
         return [
@@ -121,9 +123,27 @@ export default class LSSalesPanel extends NavigationMixin(LightningElement) {
         var leadOppSet = new Set();
         var selectedRecords = this.template.querySelector("lightning-datatable").getSelectedRows();
         var convertButton = this.template.querySelector('[data-my-id="convertButton"]');
+
+        if (Array.isArray(selectedRecords)) {
+            if (selectedRecords.length > 0) {
+                this.convertDisable = false;
+                this.buttonDisable = false;
+            } else {
+                this.convertDisable = true;
+                this.buttonDisable = true;
+            }
+        } else {
+            this.convertDisable = true;
+            this.buttonDisable = true;
+        }
+
+        var oppSelectedRecords = [];
         convertButton.textContent = neutralConvert;
         for (let value in selectedRecords) {
             leadOppSet.add(selectedRecords[value].type);
+            if (selectedRecords[value].type === oppType) {
+                oppSelectedRecords.push(selectedRecords[value]);
+            }
         }
         if (leadOppSet.size > 1) {
             convertButton.textContent = neutralConvert;
@@ -134,38 +154,55 @@ export default class LSSalesPanel extends NavigationMixin(LightningElement) {
                 convertButton.textContent = oppConvert;
             }
         }
+        if (oppSelectedRecords.length > 1) {
+            this.convertDisable = true;
+        }
     }
 
     convertRecord(event) {
         var leadIds = new Set();
+        var oppIds = new Set ();
         var selectedRecords = this.template.querySelector("lightning-datatable").getSelectedRows();
         for (let value in selectedRecords) {
-            if (selectedRecords[value].type === 'Lead') {
+            if (selectedRecords[value].type === leadType) {
                 leadIds.add(selectedRecords[value].id);
             }
+            if (selectedRecords[value].type === oppType) {
+                oppIds.add(selectedRecords[value].id);
+            }
         }
-        convertLeadRequest({ LeadIds: JSON.stringify([...leadIds]) })
-            .then(result => {
-                var requestResponse = JSON.parse(result);
-                console.log('converButton: requestResponse', requestResponse);
-                const success = new ShowToastEvent({
-                    "title": "Success!",
-                    "message": "Leads converted successfully",
-                    "variant": "success",
+        if (leadIds.size > 0) {
+            convertLeadRequest({ LeadIds: JSON.stringify([...leadIds]) })
+                .then(result => {
+                    var requestResponse = JSON.parse(result);
+                    console.log('converButton: requestResponse', requestResponse);
+                    const success = new ShowToastEvent({
+                        "title": "Success!",
+                        "message": "Leads converted successfully",
+                        "variant": "success",
+                    });
+                    this.dispatchEvent(success);
+                    refreshApex(this.inputData);
+                })
+                .catch(error => {
+                    console.log('error', error);
+                    const newError = new ShowToastEvent({
+                        "title": "Error",
+                        "message": error.body.message,
+                        "variant": "error",
+                    });
+                    this.dispatchEvent(newError);
                 });
-                this.dispatchEvent(success);
-                refreshApex(this.inputData);
-            })
-            .catch(error => {
-                console.log('error', error);
-                const newError = new ShowToastEvent({
-                    "title": "Error",
-                    "message": error.body.message,
-                    "variant": "error",
-                });
-                this.dispatchEvent(newError);
+        } 
+        if (oppIds.size > 0) {
+            const newInfo = new ShowToastEvent({
+                "title": "Info",
+                "message": "Convert to Sale function has not been defined.",
+                "variant": "info",
             });
-            console.log('convert clicked');
+            this.dispatchEvent(newInfo);
+        }
+        console.log('convert clicked');
     }
 
     newRecord(event) {
