@@ -14,4 +14,19 @@ public with sharing class LSSalesPanelCtrl {
         }
         return response;
     }
+
+    @AuraEnabled
+    public static string convertLeads(String LeadIds){
+        System.debug('Parameter LeadIds: ' + LeadIds);
+        List<Id> newLeadIds = (List<Id>)JSON.deserialize(LeadIds,List<Id>.class);
+        System.debug('newLeadIds: ' + newLeadIds);
+        String response = '';
+        try {
+            response = LSSalesPanelHelper.leadConversion(newLeadIds);
+        } catch (Exception e) {
+            System.debug('Exception: ' + e.getMessage() + ' ' + e.getLineNumber());
+            throw new AuraHandledException(e.getMessage());
+        }
+        return JSON.serialize(response);
+    }
 }

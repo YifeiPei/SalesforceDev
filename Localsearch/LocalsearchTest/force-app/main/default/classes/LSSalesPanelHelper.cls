@@ -45,6 +45,29 @@ public with sharing class LSSalesPanelHelper {
         return newResposne;
     }
 
+    public static String leadConversion (List<Id> LeadIds) {
+        String response = '';
+
+        List<Database.LeadConvert> leadConverts = new list<Database.LeadConvert>();
+        LeadStatus convertedStatus = [SELECT MasterLabel FROM LeadStatus WHERE IsConverted = true LIMIT 1];
+        for(Id leadId: LeadIds) { 
+            Database.LeadConvert lc = new Database.LeadConvert();
+            lc.setLeadId(leadId); 
+            lc.setConvertedStatus(convertedStatus.MasterLabel);
+            leadConverts.add(lc);
+        }
+        List<Database.LeadConvertResult> lcrList = Database.convertLead(leadConverts);
+        for(Database.LeadConvertResult lcr : lcrList) {
+            if (!lcr.isSuccess()) {
+                response = lcr.errors.get(0).message;
+            }
+        }
+        if (response == '')
+            response = 'Success';
+        
+        return response;
+    }
+
     public Class salesInfo {
         @AuraEnabled
         public String id;

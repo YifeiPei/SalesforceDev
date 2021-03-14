@@ -3,6 +3,7 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { NavigationMixin } from 'lightning/navigation';
 import { refreshApex } from '@salesforce/apex';
 import getSalesInfo from '@salesforce/apex/LSSalesPanelCtrl.getData';
+import convertLeadRequest from '@salesforce/apex/LSSalesPanelCtrl.convertLeads';
 
 const columns = [
     { label: 'Business Name', fieldName: 'businessName', sortable: "true" },
@@ -136,7 +137,35 @@ export default class LSSalesPanel extends NavigationMixin(LightningElement) {
     }
 
     convertRecord(event) {
-        console.log('convert clicked');
+        var leadIds = new Set();
+        var selectedRecords = this.template.querySelector("lightning-datatable").getSelectedRows();
+        for (let value in selectedRecords) {
+            if (selectedRecords[value].type === 'Lead') {
+                leadIds.add(selectedRecords[value].id);
+            }
+        }
+        convertLeadRequest({ LeadIds: JSON.stringify([...leadIds]) })
+            .then(result => {
+                var requestResponse = JSON.parse(result);
+                console.log('converButton: requestResponse', requestResponse);
+                const success = new ShowToastEvent({
+                    "title": "Success!",
+                    "message": "Leads converted successfully",
+                    "variant": "success",
+                });
+                this.dispatchEvent(success);
+                refreshApex(this.inputData);
+            })
+            .catch(error => {
+                console.log('error', error);
+                const newError = new ShowToastEvent({
+                    "title": "Error",
+                    "message": error.body.message,
+                    "variant": "error",
+                });
+                this.dispatchEvent(newError);
+            });
+            console.log('convert clicked');
     }
 
     newRecord(event) {
