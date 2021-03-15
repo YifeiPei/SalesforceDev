@@ -4,11 +4,11 @@ public with sharing class LSSalesPanelHelper {
     }
 
     private static List<Lead> getLeadRecords() {
-        return [Select Id,Company,Status,Due_Date__c From Lead Order by Due_Date__c ASC];
+        return [Select Id,Company,Status,Due_Date__c From Lead Where OwnerId = :UserInfo.getUserId() Order by Due_Date__c ASC];
     }
 
     private static List<Opportunity> getOpportunityRecords() {
-        return [Select Id,Account.Name,StageName,CloseDate From Opportunity Order by CloseDate ASC];
+        return [Select Id,Account.Name,StageName,CloseDate From Opportunity Where OwnerId = :UserInfo.getUserId() Order by CloseDate ASC];
     }
 
     public static List<salesInfo> getRecords() {
