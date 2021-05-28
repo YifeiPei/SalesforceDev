@@ -12,7 +12,7 @@ public class ContactTriggerHandler extends BaseTriggerHandler {
     }
 
     public override void afterInsert () {
-        
+        ContactTriggerService.triggerApprovalProcess(Trigger.new, Trigger.oldMap, Enums.TriggerContext.AFTER_INSERT);
     }
 
     public override void afterUpdate () {
