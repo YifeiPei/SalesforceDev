@@ -1,0 +1,16 @@
+<apex:page Controller="accConSearchCtrl">
+  <apex:form>
+    <apex:inputText value="{!searchKey}" label="Input" />
+    <apex:commandButton value="Enter" action="{!search}" />
+    <apex:commandButton value="Clear" action="{!clear}"/>
+    <apex:pageBlock title="Searched records are:-">
+      <apex:pageBlockTable value="{!outPut}" var="rec">
+        <apex:column headerValue="Record Name" value="{!rec.name}" />
+        <apex:column headerValue="Record Type" value="{!rec.type}" />
+        <apex:column headerValue="Click to open">
+          <apex:outputLink value="/{!rec.id}" target="_blank">View</apex:outputLink>
+        </apex:column>
+      </apex:pageBlockTable>
+    </apex:pageBlock>
+  </apex:form>
+</apex:page>
