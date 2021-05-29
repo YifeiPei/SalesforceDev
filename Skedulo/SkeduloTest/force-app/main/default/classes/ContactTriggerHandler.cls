@@ -13,11 +13,14 @@ public class ContactTriggerHandler extends BaseTriggerHandler{
 	}
 
 	public override void afterUpdate(){
+		ContactTriggerService.sumContacts(Trigger.new, Trigger.oldMap, Enums.TriggerContext.AFTER_UPDATE);
 	}
 
 	public override void afterDelete(){
+		ContactTriggerService.sumContacts(Trigger.new, Trigger.oldMap, Enums.TriggerContext.AFTER_DELETE);
 	}
 
 	public override void afterUndelete(){
+		ContactTriggerService.sumContacts(Trigger.new, Trigger.oldMap, Enums.TriggerContext.AFTER_UNDELETE);
 	}
 }

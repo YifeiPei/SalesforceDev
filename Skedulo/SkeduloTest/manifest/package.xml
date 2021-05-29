@@ -4,5 +4,14 @@
 		<members>*</members>
 		<name>ApprovalProcess</name>
 	</types>
+	<types>
+		<members>Account</members>
+		<members>Contact</members>
+		<name>CustomObject</name>
+	</types>
+	<types>
+		<members>Admin</members>
+		<name>Profile</name>
+	</types>
 	<version>51.0</version>
 </Package>
