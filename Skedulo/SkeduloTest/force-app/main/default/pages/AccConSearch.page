@@ -1,14 +1,57 @@
-<apex:page Controller="accConSearchCtrl">
-  <apex:form>
-    <apex:inputText value="{!searchKey}" label="Input" />
-    <apex:commandButton value="Enter" action="{!search}" />
-    <apex:commandButton value="Clear" action="{!clear}"/>
-    <apex:pageBlock title="Searched records are:-">
-      <apex:pageBlockTable value="{!outPut}" var="rec">
-        <apex:column headerValue="Record Name" value="{!rec.name}" />
-        <apex:column headerValue="Record Type" value="{!rec.type}" />
-        <apex:column headerValue="Click to open">
-          <apex:outputLink value="/{!rec.id}" target="_blank">View</apex:outputLink>
+<apex:page Controller="accConSearchCtrl" Extensions="accConSearchHelper" id="accConSearchPage">
+  <apex:includeScript value="//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" />
+  <script type="text/javascript">
+  function incrementCounter(index) {
+    var newCounter;
+    var recordId = document.getElementById('accConSearchPage:accConSearchForm:recordPanel:recordTable:'+index+':recordIdValue').innerHTML;
+    var recordType = document.getElementById('accConSearchPage:accConSearchForm:recordPanel:recordTable:'+index+':recordTypeValue').innerHTML;
+    Visualforce.remoting.Manager.invokeAction(
+      '{!$RemoteAction.accConSearchHelper.addCounter}',
+      recordId,
+      recordType,
+      index,
+      function(result, event){
+        if (event.status) {
+          var resultValue = JSON.parse(result);
+          if (resultValue.errorMessage == null) {
+            document.getElementById('accConSearchPage:accConSearchForm:recordPanel:recordTable:'+resultValue.index+':recordCounterValue').innerHTML = resultValue.counter;
+          } else {
+            document.getElementById("responseErrors").innerHTML = resultValue.errorMessage;
+          }
+        } else if (event.type === 'exception') {
+          document.getElementById("responseErrors").innerHTML = event.message + "<br/>\n<pre>" + event.where + "</pre>";
+        } else {
+          document.getElementById("responseErrors").innerHTML = event.message;
+        }
+      },
+      {escape: false}
+    );
+  }
+  </script>
+  <apex:form id="accConSearchForm">
+    <apex:inputText value="{!searchKey}" label="Input" id="searchInput"/>
+    <apex:commandButton value="Enter" action="{!search}" id="searchEnter"/>
+    <apex:commandButton value="Clear" action="{!clear}" id="searchClear"/>
+    <div id="responseErrors"></div>
+    <apex:pageBlock title="Searched records are:-" id="recordPanel">
+      <apex:variable var="index" value="{!0}" />
+      <apex:pageBlockTable value="{!outPut}" var="rec" rules="rows" id="recordTable">
+        <apex:column headerValue="Record Name" id="recordName">
+          <apex:outputText value="{!rec.name}" id="recordNameValue"/>
+          <apex:outputText value="{!rec.id}" id="recordIdValue" style="display:none"/>
+        </apex:column>
+        <apex:column headerValue="Record Type" id="recordType" styleClass="recordType">
+          <apex:outputText value="{!rec.type}" id="recordTypeValue"/>
+        </apex:column>
+        <apex:column headerValue="Click to open" id="recordOpen">
+          <apex:outputLink value="/{!rec.id}" target="_blank" id="recordClick">View</apex:outputLink>
+        </apex:column>
+        <apex:column headerValue="Counter" id="recordCounter">
+          <apex:outputText value="{!rec.counter}" id="recordCounterValue"/>
+        </apex:column>
+        <apex:column headerValue="Click to update counter" id="recordUpdate">
+          <apex:commandLink onclick="{incrementCounter({!index})}; return false;" value="Increment Counter" id="addCounter"/>
+          <apex:variable var="index" value="{!index + 1}" />
         </apex:column>
       </apex:pageBlockTable>
     </apex:pageBlock>

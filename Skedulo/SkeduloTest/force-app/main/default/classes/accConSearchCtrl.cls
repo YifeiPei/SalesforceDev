@@ -26,12 +26,12 @@ public with sharing class accConSearchCtrl{
 	// search function only search on starting strings
 	// as Account Name and Contact Name are case-insensitive fields, the soql search is automatically case-insensitive
 	private static List<Account> getAccRecords(String keyWord){
-		return [Select Id, Name
+		return [Select Id, Name, Counter__c
 		        From Account
 		        Where Name Like :keyWord + '%'];
 	}
 	private static List<Contact> getConRecords(String keyWord){
-		return [Select Id, Name
+		return [Select Id, Name, Counter__c
 		        From Contact
 		        Where Name Like :keyWord + '%'];
 	}
@@ -40,12 +40,14 @@ public with sharing class accConSearchCtrl{
 		public String id{get;set;}
 		public String name{get;set;}
 		public String type{get;set;}
+        public Integer counter{get;set;}
 
 		public outputModel(Account accRecord){
 			Id accId = accRecord.Id;
 			this.id = accRecord.Id;
 			this.name = accRecord.Name;
 			this.type = accId.getSObjectType().getDescribe().getName();
+            this.counter = Integer.valueOf(accRecord.Counter__c);
 		}
 
 		public outputModel(Contact conRecord){
@@ -53,6 +55,7 @@ public with sharing class accConSearchCtrl{
 			this.id = conRecord.Id;
 			this.name = conRecord.Name;
 			this.type = conId.getSObjectType().getDescribe().getName();
+            this.counter = Integer.valueOf(conRecord.Counter__c);
 		}
 	}
 }
