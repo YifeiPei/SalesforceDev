@@ -1,5 +1,4 @@
 <apex:page Controller="accConSearchCtrl" Extensions="accConSearchHelper" id="accConSearchPage">
-  <apex:includeScript value="//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" />
   <script type="text/javascript">
   function incrementCounter(index) {
     var newCounter;
